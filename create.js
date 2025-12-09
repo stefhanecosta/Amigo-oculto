@@ -1,4 +1,4 @@
-import { db } from "./firebase-config.js";
+import { db, auth, ensureAuth } from "./firebase-config.js";
 import {
   collection,
   doc,
@@ -16,7 +16,6 @@ import {
       .filter(s => s.length > 0);
   }
 
-  // Cria derangement (ninguém tira a si mesmo).
   function makeDerangement(list){
     if (list.length <= 1) return null;
     let shuffled;
@@ -25,7 +24,6 @@ import {
     for (let t=0; t<maxAttempts; t++){
       shuffled = [...list];
 
-      // Fisher-Yates
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -39,7 +37,6 @@ import {
       if (ok) return shuffled;
     }
 
-    // fallback
     shuffled = [...list];
     for (let i=0;i<shuffled.length-1;i++){
       if (shuffled[i] === list[i]) {
@@ -71,6 +68,9 @@ import {
   form.addEventListener('submit', async function(e){
     e.preventDefault();
 
+    // Garante que o usuário está autenticado
+    const user = await ensureAuth();
+    
     const eventName = document.getElementById('eventName').value.trim();
     const participantsRaw = document.getElementById('participants').value;
     const participants = parseParticipants(participantsRaw);
@@ -98,34 +98,30 @@ import {
       name: eventName,
       participants,
       draws,
+      createdBy: user.uid, // ID do usuário que criou
       createdAt: Date.now()
     };
 
-    console.log('Salvando evento:', payload); // Debug
+    console.log('Salvando evento:', payload);
 
-    // Salva no Firebase
     try {
       await setDoc(doc(collection(db, "events"), id), payload);
-      console.log('Evento salvo com sucesso!'); // Debug
+      console.log('Evento salvo com sucesso!');
     } catch (err){
-      console.error('Erro ao salvar:', err); // Debug detalhado
+      console.error('Erro ao salvar:', err);
       alert("Erro ao salvar no servidor: " + err.message);
       return;
     }
 
-    // Gera link - CORRIGIDO: usando template literal correto
     const link = `${window.location.origin}/draw.html?event=${id}`;
-    console.log('Link gerado:', link); // Debug
+    console.log('Link gerado:', link);
 
-    // Exibe link
     const generatedLinkDiv = document.getElementById('generatedLink');
     const linkBox = document.getElementById('linkBox');
     
     if (generatedLinkDiv && linkBox) {
       linkBox.value = link;
       generatedLinkDiv.classList.remove('hidden');
-    } else {
-      console.error('Elementos não encontrados!');
     }
   });
 

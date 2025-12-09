@@ -15,7 +15,7 @@
       <input id="eventName" type="text" required placeholder="Ex: Natal da Família" />
 
       <label for="participants">Participantes (um por linha)</label>
-      <textarea id="participants" rows="8" required placeholder="João&#10;Maria&#10;Carlos&#10;Ana"></textarea>
+      <textarea id="participants" rows="8" required placeholder="João\nMaria\nCarlos\nAna"></textarea>
 
       <button type="submit" class="btn">Gerar Link</button>
     </form>
@@ -27,13 +27,15 @@
         <button id="copyLink" class="btn small">Copiar</button>
         <button id="openLink" class="btn small">Abrir</button>
       </div>
-      <p class="hint">Qualquer pessoa com esse link poderá entrar e descobrir seu sorteado.</p>
+      <p class="hint">Qualquer pessoa que abrir esse link poderá digitar o seu nome e poderá ver o sorteado (sem mostrar aos outros).</p>
     </div>
   </div>
 
-  <!-- Firebase deve vir antes do create.js -->
+  <script src="create.js"></script>
+
   <script type="module" src="firebase-config.js"></script>
-  <script type="module" src="create.js"></script>
+<script type="module" src="create.js"></script> <!-- só na index -->
+<script type="module" src="draw.js"></script>   <!-- só na draw -->
 
 </body>
 </html>

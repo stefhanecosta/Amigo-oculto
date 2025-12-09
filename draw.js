@@ -1,13 +1,11 @@
 // draw.js — usado por draw.html (versão Firebase)
+import { db, ensureAuth } from "./firebase-config.js";
 import { 
-  getFirestore, 
   doc, 
   getDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 (function(){
-  const db = getFirestore();
-
   const params = new URLSearchParams(window.location.search);
   const eventId = params.get('event');
   const eventTitleEl = document.getElementById('eventTitle');
@@ -25,12 +23,16 @@ import {
 
   async function loadEvent(id){
     try {
+      // Garante autenticação antes de buscar
+      await ensureAuth();
+      
+      // ATENÇÃO: Nome da coleção deve ser "events" (igual no create.js)
       const ref = doc(db, "events", id);
       const snap = await getDoc(ref);
       if (!snap.exists()) return null;
       return snap.data();
     } catch (err){
-      console.error(err);
+      console.error("Erro ao carregar evento:", err);
       return null;
     }
   }
