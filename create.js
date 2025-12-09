@@ -101,36 +101,54 @@ import {
       createdAt: Date.now()
     };
 
-    // ⭐ Salva no Firebase
+    console.log('Salvando evento:', payload); // Debug
+
+    // Salva no Firebase
     try {
       await setDoc(doc(collection(db, "events"), id), payload);
+      console.log('Evento salvo com sucesso!'); // Debug
     } catch (err){
+      console.error('Erro ao salvar:', err); // Debug detalhado
       alert("Erro ao salvar no servidor: " + err.message);
       return;
     }
 
-    // Gera link
+    // Gera link - CORRIGIDO: usando template literal correto
     const link = `${window.location.origin}/draw.html?event=${id}`;
+    console.log('Link gerado:', link); // Debug
 
     // Exibe link
-    document.getElementById('generatedLink').classList.remove('hidden');
-    document.getElementById('linkBox').value = link;
+    const generatedLinkDiv = document.getElementById('generatedLink');
+    const linkBox = document.getElementById('linkBox');
+    
+    if (generatedLinkDiv && linkBox) {
+      linkBox.value = link;
+      generatedLinkDiv.classList.remove('hidden');
+    } else {
+      console.error('Elementos não encontrados!');
+    }
   });
 
-  document.getElementById('copyLink').addEventListener('click', function(){
-    const box = document.getElementById('linkBox');
-    if (!box) return;
-    navigator.clipboard.writeText(box.value).then(() => {
-      alert('Link copiado com sucesso!');
-    }).catch(()=>{ 
-      alert('Não foi possível copiar. Copie manualmente.');
+  const copyBtn = document.getElementById('copyLink');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function(){
+      const box = document.getElementById('linkBox');
+      if (!box) return;
+      navigator.clipboard.writeText(box.value).then(() => {
+        alert('Link copiado com sucesso!');
+      }).catch(()=>{ 
+        alert('Não foi possível copiar. Copie manualmente.');
+      });
     });
-  });
+  }
 
-  document.getElementById('openLink').addEventListener('click', function(){
-    const box = document.getElementById('linkBox');
-    if (!box) return;
-    window.open(box.value, "_blank");
-  });
+  const openBtn = document.getElementById('openLink');
+  if (openBtn) {
+    openBtn.addEventListener('click', function(){
+      const box = document.getElementById('linkBox');
+      if (!box) return;
+      window.open(box.value, "_blank");
+    });
+  }
 
 })();
