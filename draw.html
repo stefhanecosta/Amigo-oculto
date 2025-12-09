@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Amigo Oculto — Sorteio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Amigo Oculto — Sorteio</h1>
+
+    <div class="card">
+      <p id="eventTitle" class="muted"></p>
+
+      <label for="yourName">Digite seu nome (exatamente como foi cadastrado)</label>
+      <input id="yourName" type="text" placeholder="Seu nome" />
+
+      <div class="row">
+        <button id="drawButton" class="btn">Revelar</button>
+        <button id="showList" class="btn ghost">Ver participantes</button>
+      </div>
+
+      <div id="resultBox" class="result hidden"></div>
+
+      <div id="participantsList" class="hidden small-box"></div>
+    </div>
+  </div>
+
+  <script src="draw.js"></script>
+</body>
+</html>

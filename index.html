@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Amigo Oculto — Criar Evento</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Amigo Oculto — Criar Evento</h1>
+
+    <form id="createForm" class="card">
+      <label for="eventName">Nome do Evento</label>
+      <input id="eventName" type="text" required placeholder="Ex: Natal da Família" />
+
+      <label for="participants">Participantes (um por linha)</label>
+      <textarea id="participants" rows="8" required placeholder="João\nMaria\nCarlos\nAna"></textarea>
+
+      <button type="submit" class="btn">Gerar Link</button>
+    </form>
+
+    <div id="generatedLink" class="card hidden">
+      <p>Compartilhe este link com os participantes:</p>
+      <input id="linkBox" readonly />
+      <div class="row">
+        <button id="copyLink" class="btn small">Copiar</button>
+        <button id="openLink" class="btn small">Abrir</button>
+      </div>
+      <p class="hint">Qualquer pessoa que abrir esse link poderá digitar o seu nome e poderá ver o sorteado (sem mostrar aos outros).</p>
+    </div>
+  </div>
+
+  <script src="create.js"></script>
+</body>
+</html>
