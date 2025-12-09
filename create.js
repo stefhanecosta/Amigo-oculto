@@ -1,4 +1,10 @@
-// create.js — usado por index.html
+import { db } from "./firebase-config.js";
+import {
+  collection,
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 (function(){
   const form = document.getElementById('createForm');
   if (!form) return;
@@ -10,37 +16,41 @@
       .filter(s => s.length > 0);
   }
 
-  // Cria uma derangement (nenhum participante tira a si mesmo).
+  // Cria derangement (ninguém tira a si mesmo).
   function makeDerangement(list){
-    if (list.length <= 1) return null; // impossível para 1
-    let attempt, shuffled;
+    if (list.length <= 1) return null;
+    let shuffled;
     const maxAttempts = 50;
+
     for (let t=0; t<maxAttempts; t++){
       shuffled = [...list];
-      // Fisher-Yates shuffle
+
+      // Fisher-Yates
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
-      // verifica se existe posição onde shuffled[i] === list[i]
+
       let ok = true;
-      for (let i=0;i<list.length;i++){
+      for (let i=0; i<list.length; i++){
         if (shuffled[i] === list[i]) { ok = false; break; }
       }
+
       if (ok) return shuffled;
     }
-    // fallback: algoritmo de troca simples para garantir derangement
-    // (cobre casos raros)
+
+    // fallback
     shuffled = [...list];
     for (let i=0;i<shuffled.length-1;i++){
       if (shuffled[i] === list[i]) {
         [shuffled[i], shuffled[i+1]] = [shuffled[i+1], shuffled[i]];
       }
     }
-    // último check
+
     for (let i=0;i<list.length;i++){
       if (shuffled[i] === list[i]) return null;
     }
+
     return shuffled;
   }
 
@@ -48,7 +58,7 @@
     const targets = makeDerangement(list);
     if (!targets) return null;
     const map = {};
-    for (let i=0;i<list.length;i++){
+    for (let i=0; i<list.length; i++){
       map[list[i]] = targets[i];
     }
     return map;
@@ -58,8 +68,9 @@
     return Math.random().toString(36).substring(2,10);
   }
 
-  form.addEventListener('submit', function(e){
+  form.addEventListener('submit', async function(e){
     e.preventDefault();
+
     const eventName = document.getElementById('eventName').value.trim();
     const participantsRaw = document.getElementById('participants').value;
     const participants = parseParticipants(participantsRaw);
@@ -68,6 +79,7 @@
       alert('Informe o nome do evento.');
       return;
     }
+
     if (participants.length < 2){
       alert('Cadastre pelo menos 2 participantes.');
       return;
@@ -75,28 +87,32 @@
 
     const draws = generateDrawMap(participants);
     if (!draws){
-      alert('Não foi possível gerar o sorteio sem repetições. Tente alterar a lista.');
+      alert('Não foi possível gerar o sorteio sem repetições.');
       return;
     }
 
     const id = generateId();
+
     const payload = {
       id,
       name: eventName,
       participants,
       draws,
-      createdAt: new Date().toISOString()
+      createdAt: Date.now()
     };
 
-    // Salva no localStorage sob a chave "secret-santa:{id}"
+    // ⭐ Salva no Firebase
     try {
-      localStorage.setItem('secret-santa:' + id, JSON.stringify(payload));
+      await setDoc(doc(collection(db, "events"), id), payload);
     } catch (err){
-      alert('Falha ao salvar no localStorage: ' + err.message);
+      alert("Erro ao salvar no servidor: " + err.message);
       return;
     }
 
-    const link = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '') + '/draw.html?event=' + id;
+    // Gera link
+    const link = `${window.location.origin}/draw.html?event=${id}`;
+
+    // Exibe link
     document.getElementById('generatedLink').classList.remove('hidden');
     document.getElementById('linkBox').value = link;
   });
@@ -105,13 +121,16 @@
     const box = document.getElementById('linkBox');
     if (!box) return;
     navigator.clipboard.writeText(box.value).then(() => {
-      alert('Link copiado para a área de transferência');
-    }).catch(()=>{ alert('Não foi possível copiar. Selecione e copie manualmente.'); });
+      alert('Link copiado com sucesso!');
+    }).catch(()=>{ 
+      alert('Não foi possível copiar. Copie manualmente.');
+    });
   });
 
   document.getElementById('openLink').addEventListener('click', function(){
     const box = document.getElementById('linkBox');
     if (!box) return;
-    window.open(box.value, '_blank');
+    window.open(box.value, "_blank");
   });
+
 })();

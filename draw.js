@@ -1,5 +1,13 @@
-// draw.js — usado por draw.html
+// draw.js — usado por draw.html (versão Firebase)
+import { 
+  getFirestore, 
+  doc, 
+  getDoc 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 (function(){
+  const db = getFirestore();
+
   const params = new URLSearchParams(window.location.search);
   const eventId = params.get('event');
   const eventTitleEl = document.getElementById('eventTitle');
@@ -11,66 +19,78 @@
 
   if (!eventId){
     alert('ID do evento não foi informado na URL.');
-    // opcionalmente redirecionar para index.html
   }
 
-  function loadEvent(id){
+  let eventData = null;
+
+  async function loadEvent(id){
     try {
-      const raw = localStorage.getItem('secret-santa:' + id);
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch (err) {
+      const ref = doc(db, "events", id);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return null;
+      return snap.data();
+    } catch (err){
+      console.error(err);
       return null;
     }
   }
 
-  const eventData = loadEvent(eventId);
+  // Carrega evento do Firebase
+  (async function(){
+    eventData = await loadEvent(eventId);
 
-  if (!eventData){
-    alert('Evento não encontrado ou expirado. Peça ao organizador para gerar um novo link.');
-  } else {
-    eventTitleEl.textContent = 'Evento: ' + eventData.name;
-    // preenche placeholder com o primeiro participante como sugestão (opcional)
-    if (eventData.participants && eventData.participants.length > 0){
-      yourNameInput.placeholder = 'Ex: ' + eventData.participants[0];
-      participantsListBox.textContent = 'Participantes: ' + eventData.participants.join(', ');
+    if (!eventData){
+      alert('Evento não encontrado. Peça ao organizador para gerar um novo link.');
+      return;
     }
-  }
+
+    eventTitleEl.textContent = "Evento: " + eventData.name;
+
+    if (eventData.participants?.length > 0){
+      yourNameInput.placeholder = "Ex: " + eventData.participants[0];
+      participantsListBox.textContent = "Participantes: " + eventData.participants.join(", ");
+    }
+  })();
 
   function showResult(text){
     resultBox.textContent = text;
-    resultBox.classList.remove('hidden');
+    resultBox.classList.remove("hidden");
   }
 
-  drawBtn.addEventListener('click', function(){
+  drawBtn.addEventListener("click", function(){
     if (!eventData){
-      alert('Evento não disponível.');
+      alert("Evento não carregado.");
       return;
     }
+
     const name = yourNameInput.value.trim();
-    if (!name) {
-      alert('Digite seu nome (exatamente como foi cadastrado).');
+
+    if (!name){
+      alert("Digite seu nome exatamente como foi cadastrado.");
       return;
     }
+
     const target = eventData.draws ? eventData.draws[name] : undefined;
+
     if (!target){
-      alert('Nome não encontrado. Verifique a grafia e tente novamente.');
+      alert("Nome não encontrado. Verifique a grafia.");
       return;
     }
-    // Mostra resultado
-    showResult('Você tirou: ' + target + ' 🎁');
+
+    showResult("Você tirou: " + target + " 🎁");
   });
 
-  // Mostrar/ocultar lista de participantes (apenas para conferência)
-  showListBtn.addEventListener('click', function(){
-    if (!participantsListBox) return;
-    participantsListBox.classList.toggle('hidden');
-    showListBtn.textContent = participantsListBox.classList.contains('hidden') ? 'Ver participantes' : 'Ocultar participantes';
+  // Mostrar / ocultar lista
+  showListBtn.addEventListener("click", function(){
+    participantsListBox.classList.toggle("hidden");
+    showListBtn.textContent = participantsListBox.classList.contains("hidden")
+      ? "Ver participantes"
+      : "Ocultar participantes";
   });
 
-  // também aceita Enter no campo
-  yourNameInput.addEventListener('keydown', function(e){
-    if (e.key === 'Enter') {
+  // Enter para confirmar
+  yourNameInput.addEventListener("keydown", function(e){
+    if (e.key === "Enter"){
       e.preventDefault();
       drawBtn.click();
     }

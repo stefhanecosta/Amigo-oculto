@@ -22,11 +22,15 @@
       </div>
 
       <div id="resultBox" class="result hidden"></div>
-
       <div id="participantsList" class="hidden small-box"></div>
     </div>
   </div>
 
-  <script src="draw.js"></script>
+  <!-- Firebase config (DEVE vir antes do draw.js) -->
+  <script type="module" src="firebase-config.js"></script>
+
+  <!-- draw.js versão module/fetch do Firebase -->
+  <script type="module" src="draw.js"></script>
+
 </body>
 </html>
