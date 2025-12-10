@@ -1,4 +1,3 @@
-// draw.js — com sistema de senha
 import { db } from "./firebase-config.js";
 import { 
   doc, 
@@ -31,12 +30,12 @@ import {
 
   async function loadEvent(id){
     try {
-      console.log("📥 Buscando evento:", id);
+      console.log("Buscando evento:", id);
       const ref = doc(db, "events", id);
       const snap = await getDoc(ref);
       
       if (!snap.exists()) {
-        console.warn("⚠️ Evento não existe");
+        console.warn("Evento não existe");
         return null;
       }
       
@@ -44,10 +43,10 @@ import {
       if (!data.passwords) data.passwords = {};
       if (!data.viewed) data.viewed = {};
       
-      console.log("✅ Evento carregado");
+      console.log("Evento carregado");
       return data;
     } catch (err){
-      console.error("❌ Erro ao carregar evento:", err);
+      console.error("Erro ao carregar evento:", err);
       return null;
     }
   }
@@ -63,7 +62,7 @@ import {
     return hash.toString(36);
   }
 
-  // Carrega evento
+  
   (async function(){
     eventData = await loadEvent(eventId);
 
@@ -104,7 +103,7 @@ import {
       return;
     }
 
-    // Verifica se o nome existe
+    
     const target = eventData.draws ? eventData.draws[name] : undefined;
 
     if (!target){
@@ -116,7 +115,7 @@ import {
 
     // Caso 1: Primeira vez (não tem senha cadastrada)
     if (!eventData.passwords[name]) {
-      console.log("🆕 Primeira vez de:", name);
+      console.log("Primeira vez de:", name);
       
       try {
         const eventRef = doc(db, "events", eventId);
@@ -125,18 +124,18 @@ import {
         updates[`viewed.${name}`] = Date.now();
         
         await updateDoc(eventRef, updates);
-        console.log("✅ Senha criada e visualização registrada");
+        console.log("Senha criada e visualização registrada");
         
         // Atualiza localmente
         eventData.passwords[name] = passwordHash;
         eventData.viewed[name] = Date.now();
         
         showResult("Você tirou: " + target + " 🎁");
-        passwordHint.innerHTML = "✅ Senha criada com sucesso! Guarde-a para ver novamente.";
+        passwordHint.innerHTML = "Senha criada com sucesso! Guarde-a para ver novamente.";
         passwordHint.style.color = "#166534";
         
       } catch (err) {
-        console.error("❌ Erro ao salvar senha:", err);
+        console.error("Erro ao salvar senha:", err);
         alert("Erro ao salvar senha: " + err.message);
       }
       
@@ -145,14 +144,14 @@ import {
 
     // Caso 2: Já tem senha cadastrada - verifica se está correta
     if (eventData.passwords[name] !== passwordHash) {
-      alert("❌ Senha incorreta!\n\nVocê já definiu uma senha antes. Use a mesma senha para ver novamente.");
+      alert("Senha incorreta!\n\nVocê já definiu uma senha antes. Use a mesma senha para ver novamente.");
       return;
     }
 
     // Caso 3: Senha correta - mostra resultado
-    console.log("✅ Senha correta para:", name);
+    console.log("Senha correta para:", name);
     
-    // Atualiza timestamp de visualização
+    
     try {
       const eventRef = doc(db, "events", eventId);
       const updates = {};
@@ -160,15 +159,15 @@ import {
       await updateDoc(eventRef, updates);
       eventData.viewed[name] = Date.now();
     } catch (err) {
-      console.error("⚠️ Erro ao atualizar visualização:", err);
+      console.error("Erro ao atualizar visualização:", err);
     }
     
     showResult("Você tirou: " + target + " 🎁");
-    passwordHint.innerHTML = `✅ Acesso autorizado!`;
+    passwordHint.innerHTML = `Acesso autorizado!`;
     passwordHint.style.color = "#166534";
   });
 
-  // Mostrar / ocultar lista
+  
   showListBtn.addEventListener("click", function(){
     participantsListBox.classList.toggle("hidden");
     showListBtn.textContent = participantsListBox.classList.contains("hidden")
@@ -176,7 +175,7 @@ import {
       : "Ocultar participantes";
   });
 
-  // Enter para confirmar
+  
   yourPasswordInput.addEventListener("keydown", function(e){
     if (e.key === "Enter"){
       e.preventDefault();

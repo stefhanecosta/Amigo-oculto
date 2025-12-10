@@ -10,7 +10,7 @@ import {
   
   const form = document.getElementById('createForm');
   if (!form) {
-    console.error("❌ Formulário não encontrado!");
+    console.error("Formulário não encontrado!");
     return;
   }
 
@@ -102,24 +102,24 @@ import {
         name: eventName,
         participants,
         draws,
-        passwords: {}, // Senhas vazias - serão criadas pelos usuários
-        viewed: {},     // Controle de visualizações
+        passwords: {}, 
+        viewed: {},     
         createdAt: Date.now()
       };
 
       console.log('Salvando evento:', payload);
 
       await setDoc(doc(collection(db, "events"), id), payload);
-      console.log('✅ Evento salvo com sucesso!');
+      console.log('Evento salvo com sucesso!');
 
       let baseUrl = window.location.origin;
       
       if (baseUrl.includes('-git-')) {
-        console.warn("⚠️ Você está em um preview deployment!");
+        console.warn("Você está em um preview deployment!");
       }
       
       const link = `${baseUrl}/draw.html?event=${id}`;
-      console.log("✅ Link gerado:", link);
+      console.log("Link gerado:", link);
 
       const generatedLinkDiv = document.getElementById('generatedLink');
       const linkBox = document.getElementById('linkBox');
@@ -130,7 +130,7 @@ import {
       }
 
     } catch (err){
-      console.error("❌ ERRO:", err);
+      console.error("ERRO:", err);
       alert("Erro: " + err.message);
     }
   });
