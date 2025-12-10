@@ -211,7 +211,7 @@ Este projeto está sob a licença MIT. Veja [LICENSE](LICENSE) para mais informa
 
 <div align="center">
 
-### Desenvolvido com ❤️ para facilitar o Amigo Oculto.
+### Desenvolvido para facilitar o seu Amigo Oculto ❤️
 
 
 ---
