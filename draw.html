@@ -14,7 +14,15 @@
       <p id="eventTitle" class="muted"></p>
 
       <label for="yourName">Digite seu nome (exatamente como foi cadastrado)</label>
-      <input id="yourName" type="text" placeholder="Seu nome" />
+      <input id="yourName" type="text" placeholder="Seu nome" autocomplete="off" />
+
+      <label for="yourPassword">Senha</label>
+      <input id="yourPassword" type="password" placeholder="Digite sua senha" autocomplete="off" />
+      
+      <p class="hint" id="passwordHint">
+        🔐 Na primeira vez, crie uma senha para proteger seu sorteio.<br>
+        Depois, use essa mesma senha para ver novamente.
+      </p>
 
       <div class="row">
         <button id="drawButton" class="btn">Revelar</button>
@@ -26,10 +34,7 @@
     </div>
   </div>
 
-  <!-- Firebase config (DEVE vir antes do draw.js) -->
   <script type="module" src="firebase-config.js"></script>
-
-  <!-- draw.js versão module/fetch do Firebase -->
   <script type="module" src="draw.js"></script>
 
 </body>

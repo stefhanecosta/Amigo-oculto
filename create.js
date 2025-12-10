@@ -1,4 +1,4 @@
-import { db, auth, ensureAuth } from "./firebase-config.js";
+import { db } from "./firebase-config.js";
 import {
   collection,
   doc,
@@ -6,8 +6,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 (function(){
+  console.log("=== CREATE.JS CARREGADO ===");
+  
   const form = document.getElementById('createForm');
-  if (!form) return;
+  if (!form) {
+    console.error("❌ Formulário não encontrado!");
+    return;
+  }
 
   function parseParticipants(text){
     return text
@@ -67,84 +72,83 @@ import {
 
   form.addEventListener('submit', async function(e){
     e.preventDefault();
-
-    // Garante que o usuário está autenticado
-    const user = await ensureAuth();
-    
-    const eventName = document.getElementById('eventName').value.trim();
-    const participantsRaw = document.getElementById('participants').value;
-    const participants = parseParticipants(participantsRaw);
-
-    if (!eventName){
-      alert('Informe o nome do evento.');
-      return;
-    }
-
-    if (participants.length < 2){
-      alert('Cadastre pelo menos 2 participantes.');
-      return;
-    }
-
-    const draws = generateDrawMap(participants);
-    if (!draws){
-      alert('Não foi possível gerar o sorteio sem repetições.');
-      return;
-    }
-
-    const id = generateId();
-
-    const payload = {
-      id,
-      name: eventName,
-      participants,
-      draws,
-      createdBy: user.uid, // ID do usuário que criou
-      createdAt: Date.now()
-    };
-
-    console.log('Salvando evento:', payload);
+    console.log("=== SUBMIT INICIADO ===");
 
     try {
+      const eventName = document.getElementById('eventName').value.trim();
+      const participantsRaw = document.getElementById('participants').value;
+      const participants = parseParticipants(participantsRaw);
+
+      if (!eventName){
+        alert('Informe o nome do evento.');
+        return;
+      }
+
+      if (participants.length < 2){
+        alert('Cadastre pelo menos 2 participantes.');
+        return;
+      }
+
+      const draws = generateDrawMap(participants);
+      if (!draws){
+        alert('Não foi possível gerar o sorteio sem repetições.');
+        return;
+      }
+
+      const id = generateId();
+
+      const payload = {
+        id,
+        name: eventName,
+        participants,
+        draws,
+        passwords: {}, // Senhas vazias - serão criadas pelos usuários
+        viewed: {},     // Controle de visualizações
+        createdAt: Date.now()
+      };
+
+      console.log('Salvando evento:', payload);
+
       await setDoc(doc(collection(db, "events"), id), payload);
-      console.log('Evento salvo com sucesso!');
+      console.log('✅ Evento salvo com sucesso!');
+
+      let baseUrl = window.location.origin;
+      
+      if (baseUrl.includes('-git-')) {
+        console.warn("⚠️ Você está em um preview deployment!");
+      }
+      
+      const link = `${baseUrl}/draw.html?event=${id}`;
+      console.log("✅ Link gerado:", link);
+
+      const generatedLinkDiv = document.getElementById('generatedLink');
+      const linkBox = document.getElementById('linkBox');
+      
+      if (generatedLinkDiv && linkBox) {
+        linkBox.value = link;
+        generatedLinkDiv.classList.remove('hidden');
+      }
+
     } catch (err){
-      console.error('Erro ao salvar:', err);
-      alert("Erro ao salvar no servidor: " + err.message);
-      return;
-    }
-
-    const link = `${window.location.origin}/draw.html?event=${id}`;
-    console.log('Link gerado:', link);
-
-    const generatedLinkDiv = document.getElementById('generatedLink');
-    const linkBox = document.getElementById('linkBox');
-    
-    if (generatedLinkDiv && linkBox) {
-      linkBox.value = link;
-      generatedLinkDiv.classList.remove('hidden');
+      console.error("❌ ERRO:", err);
+      alert("Erro: " + err.message);
     }
   });
 
-  const copyBtn = document.getElementById('copyLink');
-  if (copyBtn) {
-    copyBtn.addEventListener('click', function(){
-      const box = document.getElementById('linkBox');
-      if (!box) return;
-      navigator.clipboard.writeText(box.value).then(() => {
-        alert('Link copiado com sucesso!');
-      }).catch(()=>{ 
-        alert('Não foi possível copiar. Copie manualmente.');
-      });
+  document.getElementById('copyLink')?.addEventListener('click', function(){
+    const box = document.getElementById('linkBox');
+    if (!box) return;
+    navigator.clipboard.writeText(box.value).then(() => {
+      alert('Link copiado com sucesso!');
+    }).catch(()=>{ 
+      alert('Não foi possível copiar. Copie manualmente.');
     });
-  }
+  });
 
-  const openBtn = document.getElementById('openLink');
-  if (openBtn) {
-    openBtn.addEventListener('click', function(){
-      const box = document.getElementById('linkBox');
-      if (!box) return;
-      window.open(box.value, "_blank");
-    });
-  }
+  document.getElementById('openLink')?.addEventListener('click', function(){
+    const box = document.getElementById('linkBox');
+    if (!box) return;
+    window.open(box.value, "_blank");
+  });
 
 })();
