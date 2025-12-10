@@ -10,7 +10,7 @@
 
 
 
-[Ver Demo](https://amigo-oculto-one.vercel.app/)/) 
+[Ver Demo](https://amigo-oculto-one.vercel.app/) 
 
 </div>
 
