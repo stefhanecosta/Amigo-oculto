@@ -125,7 +125,7 @@ Sistema completo para organizar sorteios de Amigo Oculto onde **cada participant
 git clone https://github.com/stefhanecosta/Amigo-oculto.git
 
 # Entre na pasta
-cd AmigoSecreto
+cd Amigo-oculto
 
 # Inicie um servidor local
 python -m http.server 8000
@@ -161,14 +161,14 @@ Ou use o botão:
 ##  Estrutura do Projeto
 
 ```
-AmigoSecreto/
-├── 📄 index.html           # Página de criação
-├── 📄 draw.html            # Página de sorteio
-├── 📜 create.js            # Lógica de criação
-├── 📜 draw.js              # Lógica de sorteio
-├── 🔥 firebase-config.js   # Config Firebase
-├── 🎨 style.css            # Estilos
-└── 📖 README.md            # Documentação
+Amigo-oculto/
+├── index.html           # Página de criação
+├── draw.html            # Página de sorteio
+├── create.js            # Lógica de criação
+├── draw.js              # Lógica de sorteio
+├── firebase-config.js   # Config Firebase
+├── style.css            # Estilos
+└── README.md            # Documentação
 ```
 
 ---
@@ -184,6 +184,7 @@ AmigoSecreto/
 > A segurança é garantida através das **Regras do Firestore** e do **sistema de senhas individuais**.
 
 </div>
+
 
 **O que protege seus dados:**
 - ✅ Firestore Security Rules
@@ -215,6 +216,5 @@ Este projeto está sob a licença MIT. Veja [LICENSE](LICENSE) para mais informa
 
 ---
 
-**[⬆ Voltar ao topo](#-amigo-oculto)**
 
 </div>
